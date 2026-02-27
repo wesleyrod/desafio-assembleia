@@ -11,5 +11,5 @@ import com.teste.api.domain.associate.Associate;
 @Repository
 public interface AssociateRepository extends JpaRepository<Associate, UUID> {
     Optional<Associate> findByCpf(String cpf);
-    
+    boolean existsByCpf(String cpf);
 }
