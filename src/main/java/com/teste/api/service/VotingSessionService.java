@@ -14,6 +14,7 @@ import com.teste.api.domain.votingSession.dto.VotingResultResponseDTO;
 import com.teste.api.domain.votingSession.dto.VotingSessionRequestDTO;
 import com.teste.api.domain.votingSession.dto.VotingSessionResponseDTO;
 import com.teste.api.exception.ResourceNotFoundException;
+import com.teste.api.infra.messaging.VotingResultProducer;
 import com.teste.api.repositories.TopicRepository;
 import com.teste.api.repositories.VoteRepository;
 import com.teste.api.repositories.VotingSessionRepository;
@@ -31,6 +32,7 @@ public class VotingSessionService {
     private final VotingSessionRepository sessionRepository;
     private final TopicRepository topicRepository;
     private final VoteRepository voteRepository;
+    private final VotingResultProducer votingResultProducer;
 
     @Transactional
     public VotingSessionResponseDTO openVotingSession(VotingSessionRequestDTO request) {
@@ -53,23 +55,28 @@ public class VotingSessionService {
     }
 
     @Transactional
-    public void closeExpiredSessions() {
-        
-        List<VotingSession> expiredSessions = sessionRepository
-                .findByStatusAndClosingDateBefore(VotingSessionStatus.OPEN, LocalDateTime.now());
+public void closeExpiredSessions() {
+    LocalDateTime now = LocalDateTime.now();
+    
+    List<VotingSession> expiredSessions = sessionRepository
+            .findByStatusAndClosingDateBefore(VotingSessionStatus.OPEN, now);
 
-        if (!expiredSessions.isEmpty()) {
-            log.info("Foram encontradas {} sessões expiradas para encerrar.", expiredSessions.size());
+    if (!expiredSessions.isEmpty()) {
+        log.info("Foram encontradas {} sessões expiradas para encerrar.", expiredSessions.size());
 
-            expiredSessions.forEach(session -> {
-                session.setStatus(VotingSessionStatus.CLOSED);
-                
-                log.info("Sessão ID {} da Pauta ID {} foi encerrada com sucesso.", session.getId(), session.getTopic().getId());
-            });
+        expiredSessions.forEach(session -> {
+            session.setStatus(VotingSessionStatus.CLOSED);
+            
+            VotingResultResponseDTO result = getSessionResult(session.getId());
+            
+            votingResultProducer.sendResult(result);
+            
+            log.info("Sessão ID {} encerrada e notificada com sucesso.", session.getId());
+        });
 
-            sessionRepository.saveAll(expiredSessions);
-        }
+        sessionRepository.saveAll(expiredSessions);
     }
+}
 
 
     @Transactional(readOnly = true)
@@ -77,9 +84,9 @@ public class VotingSessionService {
         VotingSession session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Sessão de votação não encontrada."));
 
-        long totalVotes = voteRepository.countBySessionId(sessionId);
-        long totalSim = voteRepository.countBySessionIdAndVoteChoice(sessionId, VoteChoice.SIM);
-        long totalNao = voteRepository.countBySessionIdAndVoteChoice(sessionId, VoteChoice.NAO);
+        long totalVotes = voteRepository.countByVotingSessionId(sessionId);
+        long totalSim = voteRepository.countByVotingSessionIdAndVoteChoice(sessionId, VoteChoice.SIM);
+        long totalNao = voteRepository.countByVotingSessionIdAndVoteChoice(sessionId, VoteChoice.NAO);
 
         String finalResult = "EMPATE";
         if (totalSim > totalNao) {

@@ -12,7 +12,7 @@ import com.teste.api.domain.vote.VoteChoice;
 public interface VoteRepository extends JpaRepository<Vote, UUID> {
     
     boolean existsByVotingSessionIdAndAssociateId(UUID votingSessionId, UUID associateId);
-    long countBySessionId(UUID sessionId);
-    long countBySessionIdAndVoteChoice(UUID sessionId, VoteChoice voteChoice);
+    long countByVotingSessionId(UUID votingSessionId);
+    long countByVotingSessionIdAndVoteChoice(UUID votingSessionId, VoteChoice voteChoice);
     
 }
