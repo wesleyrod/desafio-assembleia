@@ -1,8 +1,12 @@
 package com.teste.api.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.teste.api.domain.associate.Associate;
 import com.teste.api.domain.vote.Vote;
@@ -16,7 +20,6 @@ import com.teste.api.repositories.AssociateRepository;
 import com.teste.api.repositories.VoteRepository;
 import com.teste.api.repositories.VotingSessionRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -54,5 +57,28 @@ public class VoteService {
         vote = voteRepository.save(vote);
 
         return new VoteResponseDTO(vote);
+    }
+
+    @Transactional (readOnly = true)
+    public List<VoteResponseDTO> findAll() {
+        return voteRepository.findAll()
+                .stream()
+                .map(VoteResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public VoteResponseDTO findById(UUID id) {
+        Vote vote = voteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Voto não encontrado."));
+        return new VoteResponseDTO(vote);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<VoteResponseDTO> findBySessionId(UUID sessionId) {
+        return voteRepository.findBySessionId(sessionId)
+                .stream()
+                .map(VoteResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }
