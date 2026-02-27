@@ -4,7 +4,7 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
-public record SessionRequestDTO(
+public record VotingSessionRequestDTO(
         @NotNull(message = "O ID da pauta (topic) é obrigatório")
         UUID topicId,
 

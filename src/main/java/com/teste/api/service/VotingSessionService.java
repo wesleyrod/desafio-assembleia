@@ -2,20 +2,24 @@ package com.teste.api.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import com.teste.api.domain.topic.Topic;
+import com.teste.api.domain.vote.VoteChoice;
 import com.teste.api.domain.votingSession.VotingSession;
 import com.teste.api.domain.votingSession.VotingSessionStatus;
+import com.teste.api.domain.votingSession.dto.VotingResultResponseDTO;
 import com.teste.api.domain.votingSession.dto.VotingSessionRequestDTO;
 import com.teste.api.domain.votingSession.dto.VotingSessionResponseDTO;
 import com.teste.api.exception.ResourceNotFoundException;
 import com.teste.api.repositories.TopicRepository;
+import com.teste.api.repositories.VoteRepository;
 import com.teste.api.repositories.VotingSessionRepository;
 
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +30,7 @@ public class VotingSessionService {
 
     private final VotingSessionRepository sessionRepository;
     private final TopicRepository topicRepository;
+    private final VoteRepository voteRepository;
 
     @Transactional
     public VotingSessionResponseDTO openVotingSession(VotingSessionRequestDTO request) {
@@ -64,5 +69,32 @@ public class VotingSessionService {
 
             sessionRepository.saveAll(expiredSessions);
         }
+    }
+
+
+    @Transactional(readOnly = true)
+    public VotingResultResponseDTO getSessionResult(UUID sessionId) {
+        VotingSession session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Sessão de votação não encontrada."));
+
+        long totalVotes = voteRepository.countBySessionId(sessionId);
+        long totalSim = voteRepository.countBySessionIdAndVoteChoice(sessionId, VoteChoice.SIM);
+        long totalNao = voteRepository.countBySessionIdAndVoteChoice(sessionId, VoteChoice.NAO);
+
+        String finalResult = "EMPATE";
+        if (totalSim > totalNao) {
+            finalResult = "APROVADA";
+        } else if (totalNao > totalSim) {
+            finalResult = "REPROVADA";
+        }
+
+        return new VotingResultResponseDTO(
+                session.getId(),
+                session.getTopic().getId(),
+                totalVotes,
+                totalSim,
+                totalNao,
+                finalResult
+        );
     }
 }
