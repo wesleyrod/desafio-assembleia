@@ -3,6 +3,7 @@ package com.teste.api.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -56,28 +57,28 @@ public class VotingSessionService {
     }
 
     @Transactional
-public void closeExpiredSessions() {
-    LocalDateTime now = LocalDateTime.now();
-    
-    List<VotingSession> expiredSessions = sessionRepository
-            .findByStatusAndClosingDateBefore(VotingSessionStatus.OPEN, now);
+    public void closeExpiredSessions() {
+        LocalDateTime now = LocalDateTime.now();
+        
+        List<VotingSession> expiredSessions = sessionRepository
+                .findByStatusAndClosingDateBefore(VotingSessionStatus.OPEN, now);
 
-    if (!expiredSessions.isEmpty()) {
-        log.info("Foram encontradas {} sessões expiradas para encerrar.", expiredSessions.size());
+        if (!expiredSessions.isEmpty()) {
+            log.info("Foram encontradas {} sessões expiradas para encerrar.", expiredSessions.size());
 
-        expiredSessions.forEach(session -> {
-            session.setStatus(VotingSessionStatus.CLOSED);
-            
-            VotingResultResponseDTO result = getSessionResult(session.getId());
-            
-            votingResultProducer.sendResult(result);
-            
-            log.info("Sessão ID {} encerrada e notificada com sucesso.", session.getId());
-        });
+            expiredSessions.forEach(session -> {
+                session.setStatus(VotingSessionStatus.CLOSED);
+                
+                VotingResultResponseDTO result = getSessionResult(session.getId());
+                
+                votingResultProducer.sendResult(result);
+                
+                log.info("Sessão ID {} encerrada e notificada com sucesso.", session.getId());
+            });
 
-        sessionRepository.saveAll(expiredSessions);
+            sessionRepository.saveAll(expiredSessions);
+        }
     }
-}
 
 
     @Transactional(readOnly = true)
@@ -104,5 +105,28 @@ public void closeExpiredSessions() {
                 totalNao,
                 finalResult
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<VotingSessionResponseDTO> findAll() {
+        return sessionRepository.findAll()
+                .stream()
+                .map(VotingSessionResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public VotingSessionResponseDTO findById(UUID id) {
+        VotingSession session = sessionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Sessão de votação não encontrada."));
+        return new VotingSessionResponseDTO(session);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VotingSessionResponseDTO> findByTopicId(UUID topicId) {
+        return sessionRepository.findByTopicId(topicId)
+                .stream()
+                .map(VotingSessionResponseDTO::new)
+                .collect(Collectors.toList());
     }
 }

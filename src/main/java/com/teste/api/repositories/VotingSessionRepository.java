@@ -14,6 +14,5 @@ import com.teste.api.domain.votingSession.VotingSessionStatus;
 public interface VotingSessionRepository extends JpaRepository<VotingSession, UUID> {
     
         List<VotingSession> findByStatusAndClosingDateBefore(VotingSessionStatus status, LocalDateTime closingDate);
-
-    
+        List<VotingSession> findByTopicId(UUID topicId);    
 }

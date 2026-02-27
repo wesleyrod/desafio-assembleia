@@ -1,6 +1,7 @@
 package com.teste.api.controller;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,22 @@ import lombok.RequiredArgsConstructor;
 public class VotingSessionController {
 
     private final VotingSessionService service;
+
+
+    @GetMapping
+    public ResponseEntity<List<VotingSessionResponseDTO>> findAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<VotingSessionResponseDTO> findById(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
+    @GetMapping("/topic/{topicId}")
+    public ResponseEntity<List<VotingSessionResponseDTO>> findByTopic(@PathVariable UUID topicId) {
+        return ResponseEntity.ok(service.findByTopicId(topicId));
+    }
 
     @PostMapping
     public ResponseEntity<VotingSessionResponseDTO> openVotingSession(
