@@ -41,7 +41,7 @@ public class Vote {
 
     @ManyToOne
     @JoinColumn(name = "voting_session_id", nullable = false)
-    private VotingSession session;
+    private VotingSession votingSession;
 
     @ManyToOne
     @JoinColumn(name = "associate_id", nullable = false)
