@@ -9,6 +9,7 @@ import com.teste.api.domain.votingSession.VotingSession;
 import com.teste.api.domain.votingSession.VotingSessionStatus;
 import com.teste.api.domain.votingSession.dto.SessionRequestDTO;
 import com.teste.api.domain.votingSession.dto.SessionResponseDTO;
+import com.teste.api.exception.ResourceNotFoundException;
 import com.teste.api.repositories.TopicRepository;
 import com.teste.api.repositories.VotingSessionRepository;
 
@@ -25,7 +26,7 @@ public class VotingSessionService {
     @Transactional
     public SessionResponseDTO openVotingSession(SessionRequestDTO request) {
         Topic topic = topicRepository.findById(request.topicId())
-                .orElseThrow(() -> new IllegalArgumentException("Pauta não encontrada."));
+        .orElseThrow(() -> new ResourceNotFoundException("Pauta não encontrada com o ID informado."));
 
         int duration = (request.durationInMinutes() != null) ? request.durationInMinutes() : 1;
         

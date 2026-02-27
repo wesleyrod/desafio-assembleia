@@ -10,6 +10,8 @@ import com.teste.api.domain.vote.dto.VoteRequestDTO;
 import com.teste.api.domain.vote.dto.VoteResponseDTO;
 import com.teste.api.domain.votingSession.VotingSession;
 import com.teste.api.domain.votingSession.VotingSessionStatus;
+import com.teste.api.exception.BusinessRulesException;
+import com.teste.api.exception.ResourceNotFoundException;
 import com.teste.api.repositories.AssociateRepository;
 import com.teste.api.repositories.VoteRepository;
 import com.teste.api.repositories.VotingSessionRepository;
@@ -29,19 +31,19 @@ public class VoteService {
     public VoteResponseDTO registerVote(VoteRequestDTO request) {
         
         VotingSession session = sessionRepository.findById(request.sessionId())
-                .orElseThrow(() -> new IllegalArgumentException("Sessão de votação não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Sessão de votação não encontrada."));
 
         if (session.getStatus() == VotingSessionStatus.CLOSED || 
             LocalDateTime.now().isAfter(session.getClosingDate())) {
-            throw new IllegalStateException("Esta sessão de votação já está encerrada.");
+            throw new BusinessRulesException("Esta sessão de votação já está encerrada.");
         }
 
         Associate associate = associateRepository.findById(request.associateId())
-                .orElseThrow(() -> new IllegalArgumentException("Associado não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Associado não encontrado."));
 
         
         if (voteRepository.existsByVotingSessionIdAndAssociateId(session.getId(), associate.getId())) {
-            throw new IllegalStateException("O associado já registrou um voto para esta sessão.");
+            throw new BusinessRulesException("O associado já registrou um voto para esta sessão.");
         }
 
         Vote vote = new Vote();
