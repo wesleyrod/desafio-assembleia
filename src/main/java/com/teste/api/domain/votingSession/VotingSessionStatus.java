@@ -1,4 +1,4 @@
-package com.teste.api.domain.session;
+package com.teste.api.domain.votingSession;
 
 public enum VotingSessionStatus {
     OPEN,

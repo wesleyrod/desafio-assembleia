@@ -1,4 +1,4 @@
-package com.teste.api.domain.session;
+package com.teste.api.domain.votingSession;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
