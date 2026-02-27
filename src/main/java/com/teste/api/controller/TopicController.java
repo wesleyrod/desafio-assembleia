@@ -63,6 +63,6 @@ public class TopicController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         topicService.delete(id);
-        return ResponseEntity.noContent().build(); // Retorna 204 No Content (padrão REST para deleção)
+        return ResponseEntity.noContent().build(); 
     }
 }

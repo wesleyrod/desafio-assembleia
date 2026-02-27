@@ -28,7 +28,6 @@ public class CpfValidationClient {
                     CpfValidationResponse.class
             );
 
-            // Se a API retornar sucesso, verificamos o "status" do JSON
             if (response.getBody() == null || !"ABLE_TO_VOTE".equalsIgnoreCase(response.getBody().status())) {
                 throw new BusinessRulesException("O associado não está apto para votar (UNABLE_TO_VOTE).");
             }
@@ -37,7 +36,6 @@ public class CpfValidationClient {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new BusinessRulesException("CPF não encontrado no sistema de validação externo.");
             }
-            // Outros erros 4xx
             throw new BusinessRulesException("Erro ao consultar a API de validação de CPF.");
             
         } catch (BusinessRulesException e) {
