@@ -76,7 +76,7 @@ public class VoteService {
     
     @Transactional(readOnly = true)
     public List<VoteResponseDTO> findBySessionId(UUID sessionId) {
-        return voteRepository.findBySessionId(sessionId)
+        return voteRepository.findByVotingSessionId(sessionId)
                 .stream()
                 .map(VoteResponseDTO::new)
                 .collect(Collectors.toList());
