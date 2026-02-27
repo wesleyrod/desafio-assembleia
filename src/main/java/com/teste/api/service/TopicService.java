@@ -1,5 +1,7 @@
 package com.teste.api.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
 import com.teste.api.domain.topic.Topic;
@@ -20,7 +22,7 @@ public class TopicService {
     public TopicResponseDTO createTopic(TopicRequestDTO request) {
         Topic topic = new Topic();
         topic.setDescription(request.description());
-        
+        topic.setCreatedAt(LocalDateTime.now());
         topic = topicRepository.save(topic);
 
         return new TopicResponseDTO(topic);
