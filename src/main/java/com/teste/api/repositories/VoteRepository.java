@@ -10,6 +10,6 @@ import com.teste.api.domain.vote.Vote;
 @Repository
 public interface VoteRepository extends JpaRepository<Vote, UUID> {
     
-    boolean existsBySessionIdAndAssociateId(UUID sessionId, UUID associateId);
+    boolean existsByVotingSessionIdAndAssociateId(UUID votingSessionId, UUID associateId);
     
 }
