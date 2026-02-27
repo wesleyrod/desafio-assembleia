@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.teste.api.domain.associate.Associate;
-import com.teste.api.domain.session.Session;
+import com.teste.api.domain.session.VotingSession;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -40,8 +40,8 @@ public class Vote {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "session_id", nullable = false)
-    private Session session;
+    @JoinColumn(name = "voting_session_id", nullable = false)
+    private VotingSession session;
 
     @ManyToOne
     @JoinColumn(name = "associate_id", nullable = false)

@@ -20,13 +20,13 @@ import lombok.Setter;
 
 import com.teste.api.domain.topic.Topic;
 
-@Table(name = "session")
+@Table(name = "voting_session")
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Session {
+public class VotingSession {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
