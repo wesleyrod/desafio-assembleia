@@ -46,6 +46,7 @@ public class VotingSessionService {
 
         VotingSession session = new VotingSession();
         session.setTopic(topic);
+        session.setOpeningDate(now);
         session.setClosingDate(closingDate);
         session.setStatus(VotingSessionStatus.OPEN);
 
