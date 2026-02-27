@@ -5,14 +5,14 @@ import java.util.UUID;
 
 import com.teste.api.domain.votingSession.VotingSession;
 
-public record SessionResponse(
+public record SessionResponseDTO(
         UUID id,
         UUID topicId,
         LocalDateTime openingDate,
         LocalDateTime closingDate,
         String status
 ) {
-    public SessionResponse(VotingSession session) {
+    public SessionResponseDTO(VotingSession session) {
         this(
                 session.getId(),
                 session.getTopic().getId(),
