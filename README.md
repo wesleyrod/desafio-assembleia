@@ -38,8 +38,8 @@ Pensando em um cenário de produção com alta volumetria e rigorosos padrões d
 
 1. Clone o repositório:
    ```bash
-   git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
-   cd seu-repositorio
+   git clone https://github.com/wesleyrod/desafio-assembleia
+   cd desafio-assembleia
    ```
 2. Suba a infraestrutura (Banco de Dados, Kafka e Zookeeper) via Docker:
     ```bash
